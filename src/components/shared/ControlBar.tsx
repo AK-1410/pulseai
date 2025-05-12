@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Mic, MicOff, Camera, Share, More, EndCall } from 'lucide-react';
+import { Mic, MicOff, Camera, Share, MoreHorizontal, PhoneOff } from 'lucide-react';
 import { cn } from "@/lib/utils";
 
 interface ControlBarProps {
@@ -51,7 +51,7 @@ const ControlBar: React.FC<ControlBarProps> = ({ onEndCall, className }) => {
           className="w-10 h-10 rounded-full flex-center bg-soft-gray hover:bg-opacity-80 transition-all"
           aria-label="More options"
         >
-          <More size={20} />
+          <MoreHorizontal size={20} />
         </button>
       </div>
       
@@ -61,7 +61,7 @@ const ControlBar: React.FC<ControlBarProps> = ({ onEndCall, className }) => {
         aria-label="End call"
       >
         <span className="flex items-center gap-2">
-          <EndCall size={18} />
+          <PhoneOff size={18} />
           End Call
         </span>
       </button>
