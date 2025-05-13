@@ -1,10 +1,11 @@
 
 import React, { useState } from 'react';
-import Card from './shared/Card';
 import VideoTile from './shared/VideoTile';
 import NovaAvatar from './shared/NovaAvatar';
 import ControlBar from './shared/ControlBar';
 import ChatBubble from './shared/ChatBubble';
+import Card from './shared/Card';
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { Clock, Share, Captions } from 'lucide-react';
 
 interface InterviewCallProps {
@@ -14,7 +15,13 @@ interface InterviewCallProps {
 const InterviewCall: React.FC<InterviewCallProps> = ({ onEndCall }) => {
   const [elapsedTime, setElapsedTime] = useState('24:01');
   const [showCaptions, setShowCaptions] = useState(true);
+  const [fullscreenLeft, setFullscreenLeft] = useState(false);
+  const [fullscreenRight, setFullscreenRight] = useState(false);
   
+  // This would come from the onboarding form
+  const participantName = "Nate Adams";
+  
+  // Mock transcript data - in a real app, this would be streamed from an API
   const messages = [
     {
       id: 1,
@@ -32,6 +39,16 @@ const InterviewCall: React.FC<InterviewCallProps> = ({ onEndCall }) => {
       timestamp: "11:07 AM"
     }
   ];
+
+  const toggleFullscreenLeft = () => {
+    setFullscreenLeft(!fullscreenLeft);
+    setFullscreenRight(false);
+  };
+
+  const toggleFullscreenRight = () => {
+    setFullscreenRight(!fullscreenRight);
+    setFullscreenLeft(false);
+  };
   
   return (
     <div className="min-h-screen flex flex-col">
@@ -46,7 +63,7 @@ const InterviewCall: React.FC<InterviewCallProps> = ({ onEndCall }) => {
               </svg>
             </div>
             <div>
-              <h2 className="text-lg font-bold">[Product Discovery] DoorDash &lt;&gt; Nate Adams</h2>
+              <h2 className="text-lg font-bold">[Product Discovery] DoorDash &lt;&gt; {participantName}</h2>
               <p className="text-xs text-gray-400">June 15th, 2025 | 11:00 AM</p>
             </div>
           </div>
@@ -68,56 +85,66 @@ const InterviewCall: React.FC<InterviewCallProps> = ({ onEndCall }) => {
         </div>
       </Card>
       
-      {/* Main Content */}
-      <div className="container flex-1 grid grid-cols-1 md:grid-cols-12 gap-6 mb-6">
-        {/* Left: Participant Video */}
-        <div className="md:col-span-6">
+      {/* Main Content with 12-column grid */}
+      <div className="container grid grid-cols-12 gap-6 mb-6">
+        {/* Left: Interviewee Video (65% width) */}
+        <div className={`${fullscreenLeft ? 'col-span-12' : 'col-span-8'} ${fullscreenRight ? 'hidden' : ''}`}>
           <VideoTile
-            name="Nate Adams"
+            name={participantName}
             timer={elapsedTime}
             isRecording={true}
             fallbackImage="/placeholder.svg"
+            onFullscreenToggle={toggleFullscreenLeft}
+            isFullscreen={fullscreenLeft}
           />
         </div>
         
-        {/* Center: Nova Video */}
-        <div className="md:col-span-3">
-          <Card className="h-full flex items-center justify-center">
-            <div className="flex flex-col items-center gap-3">
+        {/* Right: Nova Video + Captions (35% width) */}
+        <div className={`${fullscreenRight ? 'col-span-12' : 'col-span-4'} ${fullscreenLeft ? 'hidden' : ''} relative`}>
+          {/* Nova Video */}
+          <VideoTile
+            name="Nova"
+            isActive={true}
+            onFullscreenToggle={toggleFullscreenRight}
+            isFullscreen={fullscreenRight}
+          >
+            <div className="flex flex-col items-center justify-center h-full">
               <NovaAvatar size="lg" isActive={true} />
-              <span className="text-gray-200 text-sm font-medium bg-soft-gray px-3 py-1 rounded-full">Nova</span>
             </div>
-          </Card>
-        </div>
-        
-        {/* Right: Captions */}
-        <div className="md:col-span-3">
-          <Card className="h-full flex flex-col">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2">
-                <NovaAvatar size="sm" />
-                <span className="font-medium">Captions</span>
-              </div>
-              <button
-                className={`p-1 rounded-full ${showCaptions ? 'bg-turquoise bg-opacity-20' : 'bg-soft-gray'}`}
-                onClick={() => setShowCaptions(!showCaptions)}
-              >
-                <Captions size={18} className="text-white" />
-              </button>
+          </VideoTile>
+          
+          {/* Captions Panel */}
+          {!fullscreenLeft && !fullscreenRight && (
+            <div className="absolute top-0 right-0 bottom-0 w-80 px-3 py-6">
+              <Card className="h-full flex flex-col bg-black bg-opacity-75 backdrop-blur-2xl">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-2">
+                    <NovaAvatar size="sm" />
+                    <span className="font-medium">Captions</span>
+                  </div>
+                  <button
+                    className={`p-1 rounded-full ${showCaptions ? 'bg-turquoise bg-opacity-20' : 'bg-soft-gray'}`}
+                    onClick={() => setShowCaptions(!showCaptions)}
+                    aria-label={showCaptions ? "Hide captions" : "Show captions"}
+                  >
+                    <Captions size={18} className="text-white" />
+                  </button>
+                </div>
+                
+                <ScrollArea className="flex-1">
+                  {showCaptions && messages.map(msg => (
+                    <ChatBubble
+                      key={msg.id}
+                      message={msg.message}
+                      sender="Nova"
+                      timestamp={msg.timestamp}
+                      isAI={true}
+                    />
+                  ))}
+                </ScrollArea>
+              </Card>
             </div>
-            
-            <div className="flex-1 overflow-y-auto space-y-4">
-              {showCaptions && messages.map(msg => (
-                <ChatBubble
-                  key={msg.id}
-                  message={msg.message}
-                  sender="Nova"
-                  timestamp={msg.timestamp}
-                  isAI={true}
-                />
-              ))}
-            </div>
-          </Card>
+          )}
         </div>
       </div>
       

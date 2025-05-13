@@ -141,3 +141,13 @@ input:disabled, select:disabled, textarea:disabled {
 .progress-dot {
   @apply w-4 h-4 rounded-full transition-all duration-200;
 }
+
+/* Voice visualization animation */
+@keyframes pulseHeight {
+  0%, 100% {
+    transform: scaleY(0.3);
+  }
+  50% {
+    transform: scaleY(1);
+  }
+}
