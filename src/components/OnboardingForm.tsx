@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import Card from './shared/Card';
 import TextField, { SelectField, TextArea } from './shared/TextField';
@@ -51,7 +50,7 @@ const OnboardingForm: React.FC<OnboardingFormProps> = ({ onComplete }) => {
     }
   };
   
-  // Added separate handler for textarea changes
+  // Fixed: Explicitly type the event parameter to handle both input and textarea elements
   const handleTextAreaChange = (e: React.ChangeEvent<HTMLTextAreaElement>, field: keyof FormData) => {
     handleChange(field, e.target.value);
   };
