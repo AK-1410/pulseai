@@ -51,6 +51,11 @@ const OnboardingForm: React.FC<OnboardingFormProps> = ({ onComplete }) => {
     }
   };
   
+  // Added separate handler for textarea changes
+  const handleTextAreaChange = (e: React.ChangeEvent<HTMLTextAreaElement>, field: keyof FormData) => {
+    handleChange(field, e.target.value);
+  };
+  
   const validateStep = (step: number): boolean => {
     const newErrors: Record<string, string> = {};
     let isValid = true;
@@ -209,7 +214,7 @@ const OnboardingForm: React.FC<OnboardingFormProps> = ({ onComplete }) => {
                         rows={2}
                         placeholder="The reason for you to conduct this interview"
                         value={formData.problemStatement}
-                        onChange={(e) => handleChange('problemStatement', (e.target as HTMLTextAreaElement).value)}
+                        onChange={(e) => handleTextAreaChange(e, 'problemStatement')}
                         error={errors.problemStatement}
                       />
                     </div>
@@ -221,7 +226,7 @@ const OnboardingForm: React.FC<OnboardingFormProps> = ({ onComplete }) => {
                         rows={2}
                         placeholder="What is that you are trying to accomplish from this interview"
                         value={formData.goal}
-                        onChange={(e) => handleChange('goal', (e.target as HTMLTextAreaElement).value)}
+                        onChange={(e) => handleTextAreaChange(e, 'goal')}
                         error={errors.goal}
                       />
                     </div>
